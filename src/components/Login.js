@@ -1,6 +1,14 @@
 import { useState, useRef } from "react";
 import Header from "./Header";
 import { checkValidation } from "../utils/validtion";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
+// import { useDispatch } from "react-redux";
+// import { addUser } from "../utils/userSlice";
+ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [signinStatus, setSigninStatus] = useState(true);
@@ -11,7 +19,8 @@ const Login = () => {
 
   const password = useRef();
 
-  //const dispatch = useDispatch();
+  //  const dispatch = useDispatch();
+    const navigate = useNavigate()
 
   const toggleSignin = () => {
     setSigninStatus(!signinStatus);
@@ -23,51 +32,52 @@ const Login = () => {
     setErrMsg(resMsg);
     if (resMsg) return;
 
-    // if (!signinStatus) {
-    //   createUserWithEmailAndPassword(
-    //     auth,
-    //     email.current.value,
-    //     password.current.value
-    //   )
-    //     .then((userCredential) => {
-    //       // Signed up
-    //       const user = userCredential.user;
-    //       //console.log(user.userImpl.accessToken);
-    //       // ...
-    //       console.log(user);
-    //       //const { uid, email } = user;
-    //       //dispatch(addUser({ uid: uid, email: email }));
-    //     })
-    //     .catch((error) => {
-    //       const errorCode = error.code;
-    //       const errorMessage = error.message;
-    //       // ..
+    if (!signinStatus) {
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          //console.log(user.userImpl.accessToken);
+          // ...
+          console.log(user);
+          navigate('/browse')
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // ..
 
-    //       setErrMsg(errorCode + "-" + errorMessage);
-    //     });
-    // } else {
-    //   signInWithEmailAndPassword(
-    //     auth,
-    //     email.current.value,
-    //     password.current.value
-    //   )
-    //     .then((userCredential) => {
-    //       // Signed in
-    //       const user = userCredential.user;
+          setErrMsg(errorCode + "-" + errorMessage);
+        });
+    } else {
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
 
-    //       //console.log(user.accessToken);
-    //       console.log(user);
-    //       //const { uid, email } = user;
-    //       //dispatch(addUser({ uid: uid, email: email }));
+          //console.log(user.accessToken);
+          console.log(user);
 
-    //       // ...
-    //     })
-    //     .catch((error) => {
-    //       const errorCode = error.code;
-    //       const errorMessage = error.message;
-    //       setErrMsg(errorCode + "-" + errorMessage);
-    //     });
-    // }
+          //const { uid, email } = user;
+          // dispatch(addUser({ uid: uid, email: email }));
+            navigate('/browse')
+
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrMsg(errorCode + "-" + errorMessage);
+        });
+    }
   };
 
   return (
